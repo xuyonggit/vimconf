@@ -1,0 +1,140 @@
+vim & python
+安装：
+vim   7.3+  8.0除外
+python 2.x
+
+
+一、安装vim
+	yum -y install vim
+	
+	# 检测vim版本以及是否支持Python
+	vim --version
+		结果中包含“+python/dyn”(即为支持)
+	
+	验证安装：
+	确保你已经安装了7.3版本以上、支持Python的Vim编辑器。你可以再次运行vim --version进行确认。如果你想知道Vim中使用的Python版本，你可以在编辑器中运行:python import sys; print(sys.version)。
+
+		2.6.6 (r266:84292, Nov 22 2013, 12:16:22)                                                                                                                  
+		[GCC 4.4.7 20120313 (Red Hat 4.4.7-4)]
+	这行命令会输出你的编辑器当前的Python版本。如果报错，那么你的编辑器就不支持Python语言，需要重装或重新编译。
+
+二、Vim扩展（也被成为bundle或插件。）
+	cd ~/
+	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+	# 将配置文件添加到你的用户的home文件夹中：
+	vim .vimrc
+	# 接下来，把下来的Vundle配置添加到配置文件的顶部：
+
+		set nocompatible              " required
+		filetype off                  " required
+		
+		" set the runtime path to include Vundle and initialize
+		set rtp+=~/.vim/bundle/Vundle.vim
+		call vundle#begin()
+		
+		" alternatively, pass a path where Vundle should install plugins
+		"call vundle#begin('~/some/path/here')
+		
+		" let Vundle manage Vundle, required
+		Plugin 'gmarik/Vundle.vim'
+		
+		" Add all your plugins here (note older versions of Vundle used Bundle instead of Plugin)
+		
+		
+		" All of your Plugins must be added before the following line
+		call vundle#end()            " required
+		filetype plugin indent on    " required
+	
+	# 新建文件.sh or .py自动加上文件头：
+	vim .vimrc
+		" 新建".sh,.py"文件，自动插入文件头
+		autocmd BufNewFile *.sh,*.py exec ":call SetTitle()"
+		" 定义注释
+		function SetComment()
+			call setline(1,"\# *************************************")
+			call append(line("."),"\# File Name: ".expand("%"))
+			call append(line(".")+1,"\# Author:  Xu Yong")
+			call append(line(".")+2,"\# Mail: 18810630236@163.com")
+			call append(line(".")+3,"\# Create Time: ".strftime("%c"))
+			call append(line(".")+4,"\# Info: ")
+			call append(line(".")+5,"\# *************************************")
+			call append(line(".")+6,"\#")  
+		endfunction
+		" 定义函数SetTitle，自动插入文件头
+		function SetTitle()
+		if expand("%:e") == "sh"
+			call SetComment()
+			call append(line(".")+7,"\#!/usr/bin/env bash")
+		endif
+		if expand("%:e") == "py"
+			call SetComment()
+			call append(line(".")+7,"\#!/usr/bin/env python")
+			call append(line(".")+8,"\# -*-coding:utf-8-*-")
+		endif
+		" 新建文件后，自动定位到文件末尾
+		autocmd BufNewFile * normal G
+		endfunction
+	
+	a)扩展1：树形文件管理
+	  Plugin：scrooloose/nerdtree
+	  1、安装：
+		git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree
+	  2、配置：
+		vim ~/.vimrc
+		增加以下配置：
+			Bundle 'scrooloose/nerdtree'                                                                                                                                                                     
+			" 打开文件自动打开树形资源管理                                                                                                                                                                   
+			autocmd vimenter * NERDTree                                                                                                                                                                      
+			let NERDTreeWinPos='left'                                                                                                                                                                        
+			let NERDTreeWinSize=30                                                                                                                                                                           
+			" 设置打开/关闭树形资源管理快捷键：Ctrl+a                                                                                                                                                        
+			map <c-a> :NERDTreeToggle<CR>                                                                                                                                                                    
+			" 设置展开收起图标                                                                                                                                                                               
+			let g:NERDTreeDirArrowExpandable = '▸'                                                                                                                                                           
+			let g:NERDTreeDirArrowCollapsible = '▾'                                                                                                                                                          
+			" 如果只剩下资源管理界面则自动关闭窗口                                                                                                                                                           
+			autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	  3、加载plugin
+		vim命令行：
+			:PluginInstall
+			
+	b)扩展2：信息栏模块
+	  Plugin:bling/vim-airline&vim-airline/vim-airline-themes
+	  1、安装：
+	    git clone https://github.com/fholgado/minibufexpl.vim ~/.vim/bundle/vim-airline
+	    git clone https://github.com/vim-airline/vim-airline-themes ~/.vim/bundle/vim-airline-themes
+	  2、配置：
+	    vim ~/.vimrc
+	    增加以下配置：
+			Bundle 'bling/vim-airline'
+			Bundle 'vim-airline/vim-airline-themes'
+			" let g:airline_section_b = '%(strftime("%C"))'
+			" let g:airline_section_y = 'BN: %{bufnr("%")}'
+			set laststatus=2
+			let g:airline#extensions#tabline#enabled = 1
+			let g:airline#extensions#tabline#left_sep = ' '
+			let g:airline#extensions#tabline#left_alt_sep = '|'
+			" 设置信息栏模板
+			let g:airline_theme='tomorrow'
+	  3、加载plugin
+		vim命令行：
+			:PluginInstall
+	c)扩展3：任务栏模块
+	  Plugin：minibufexpl
+	  1、安装：
+		git clone https://github.com/fholgado/minibufexpl.vim ~/.vim/bundle/minibufexpl
+	  2、配置：
+	    vim ~/.vimrc
+	    增加以下配置：
+			Bundle 'fholgado/minibufexpl.vim'
+			let g:miniBufExplMapWindowNavVim = 1   
+			let g:miniBufExplMapWindowNavArrows = 1   
+			let g:miniBufExplMapCTabSwitchBufs = 1   
+			let g:miniBufExplModSelTarget = 1  
+			let g:miniBufExplMoreThanOne=0
+			
+			map <F11> :MBEbp<CR>
+			map <F12> :MBEbn<CR>
+				  3、加载plugin
+		vim命令行：
+			:PluginInstall
